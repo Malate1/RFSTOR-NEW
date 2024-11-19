@@ -209,7 +209,7 @@
                                 <div class="col-xs-9" style="text-align: right; padding-top: 20px;">
                                     <button class="btn btn-warning " id="refreshButton"><i class="fa fa-refresh"></i> Refresh</button>
 
-                                    <?php if ($this->session->emp_id == '02723-2022') {?>
+                                    <?php if ($this->session->emp_id == '02723-2022' || $this->session->emp_id == '02483-2023') {?>
                                         <button class="btn btn-warning " id="refreshButton2"><i class="fa fa-refresh"></i> Update</button>
                                     <?php } ?>
                                 </div>
@@ -297,38 +297,34 @@ for (i = 0; i < coll.length; i++) {
     
     $(function() {
 
-        
-
         $("input[name='search']").autocomplete({
-    source: function (request, response) {
-        jQuery.get("<?= site_url('employee/search'); ?>", {
-            query: request.term
-        }, function (data) {
-            data = JSON.parse(data);
-            response(data);
-        });
-    },
-    search: function (e, u) {
-        $(this).addClass('loader');
-    },
-    response: function (e, u) {
-        $(this).removeClass('loader');
-    }
-}).data("ui-autocomplete")._renderItem = function (ul, item) {
-    let listItem = $("<li>").append(
-        $("<div>").css("font-family", "Inter-Regular, sans-serif").html(`${item.id} - ${item.name} - ${item.emp_no} ${item.hasCheck ? '&#x2705;' : ''}`)
-    );
-    return listItem.appendTo(ul);
-}.bind($("input[name='search']"));
+			source: function (request, response) {
+				jQuery.get("<?= site_url('employee/search'); ?>", {
+					query: request.term
+				}, function (data) {
+					data = JSON.parse(data);
+					response(data);
+				});
+			},
+			search: function (e, u) {
+				$(this).addClass('loader');
+			},
+			response: function (e, u) {
+				$(this).removeClass('loader');
+			}
+		}).data("ui-autocomplete")._renderItem = function (ul, item) {
+		let listItem = $("<li>").append(
+			$("<div>").css("font-family", "Inter-Regular, sans-serif").html(`${item.id} - ${item.name} - ${item.emp_no} ${item.hasCheck ? '&#x2705;' : ''}`)
+		);
+			return listItem.appendTo(ul);
+		}.bind($("input[name='search']"));
 
-// Triggered when an item is selected from the autocomplete list
-$("input[name='search']").on("autocompleteselect", function (event, ui) {
-    let id = ui.item.id;
-    viewAddForm(id);
-    return true;
-});
-
-
+		// Triggered when an item is selected from the autocomplete list
+		$("input[name='search']").on("autocompleteselect", function (event, ui) {
+			let id = ui.item.id;
+			viewAddForm(id);
+			return true;
+		});
 
         $("button#clear-search").click(function() {
             $("input[name = 'search']").val('');
@@ -403,8 +399,6 @@ $("input[name='search']").on("autocompleteselect", function (event, ui) {
         });
 
         });
-
-        
 
         function viewUser(usergroup) {// var table = $("table#dt-users").DataTable({
             var table = $('table#dt-users').removeAttr('width').DataTable({
@@ -605,7 +599,7 @@ $("input[name='search']").on("autocompleteselect", function (event, ui) {
 
 </script>
 
-<!-- <script>
+<script>
     $(document).ready(function() {
         function deacRequest() {
             $.ajax({
@@ -631,9 +625,9 @@ $("input[name='search']").on("autocompleteselect", function (event, ui) {
         // //Automatically trigger the deactivaation logic on page load
         // deacRequest();
     }); 
-</script> -->
+</script>
 
-<!-- <script>
+<script>
     $(document).ready(function() {
         function autoUpdate() {
             $.ajax({
@@ -659,7 +653,7 @@ $("input[name='search']").on("autocompleteselect", function (event, ui) {
         // //Automatically trigger the deactivaation logic on page load
         // deacRequest();
     });
-</script> -->
+</script>
 
 <script>
     $(document).ready(function() {

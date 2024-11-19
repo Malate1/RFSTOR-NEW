@@ -1,6 +1,8 @@
 <div>
 <link rel="stylesheet" href="<?=base_url()?>assets/plugins/sweetalert2/sweetalert2.min.css">
 <link rel="stylesheet" href="<?=base_url()?>assets/plugins/toastr/toastr.min.css">
+
+
 <style type="text/css">
     
     .birthday-gift {
@@ -467,8 +469,8 @@
                       
                         <div class="small-box bg-blue">
                             <div class="inner">
-                                <!-- <h3><?php echo $this->db->count_all('users2') ;?></h3> -->
-                                <h3><?php echo $this->db->where('status', '1')->count_all_results('users2');?></h3>
+                               
+                                <h3 class="counter"><?php echo $this->db->where('status', '1')->count_all_results('users2');?></h3>
                                 <p>Active Users</p>
                             </div>
                             <div class="icon">
@@ -480,12 +482,14 @@
                         </div>
                     </div>
 
+                    
+
                     <div class="col-lg-4 col-xs-12">
                       
                         <div class="small-box bg-blue">
                             <div class="inner">
                                 <!-- <h3><?php echo $this->db->count_all('business_unit') ;?></h3> -->
-                                <h3><?php echo $this->db->where('status', 'active')->count_all_results('business_unit');?></h3>
+                                <h3 class="counter"><?php echo $this->db->where('status', 'active')->count_all_results('business_unit');?></h3>
 
                                 <p>Business Units</p>
                             </div>
@@ -502,7 +506,7 @@
                       <!-- small box -->
                         <div class="small-box bg-blue">
                             <div class="inner">
-                              <h3><?php echo $this->db->count_all('company') ;?></h3>
+                              <h3 class="counter"><?php echo $this->db->count_all('company') ;?></h3>
                               <p>Companies</p>
                             </div>
                             <div class="icon">
@@ -515,6 +519,22 @@
                     </div>
                     
                 </div>
+
+                <script type="text/javascript">
+                        $(document).ready(function() {
+                            $('.counter').each(function () {
+                                $(this).prop('Counter',0).animate({
+                                    Counter: $(this).text()
+                                }, {
+                                    duration: 5000,
+                                    easing: 'swing',
+                                    step: function (now) {
+                                        $(this).text(Math.ceil(now));
+                                    }
+                                });
+                            });
+                        });
+                    </script>
             <?php } ?>
             <br>
 
@@ -980,17 +1000,17 @@
 
             <?php if($getType1 == true){ ?>
                 <div class="row" style="margin-top: 10px;">
-                    <div class="col-md-6">
+                    <!-- <div class="col-md-6">
                         <div class="box box-primary">
                             <div class="box-header " style="text-align: center;">
                                 <h3 class="box-title" >Number of Requests per Month</h3>
 
                                 <div class="box-tools pull-right">
                                     <button style="border: none;" type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-                                <!-- <button style="border: none;" type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button> -->
+                               
                                 </div>
                             </div>
-                            <!-- /.box-header -->
+                            
                             <div class="box-body">
                                 <div style="text-align: center;" >
                                   
@@ -1000,19 +1020,6 @@
                                     <i class="fa fa-circle-o text-gray fa-lg"></i> ISR &nbsp;
                                   
                                 </div>
-
-                                <!-- <div>
-                                    <label for="yearFilter">Select Year:</label>
-                                    <select id="yearFilter" onchange="fetchDataCountByMonth()">
-                                        
-                                        <script>
-                                            const currentYear = new Date().getFullYear();
-                                            for (let year = currentYear; year >= 2023; year--) {
-                                                document.write(`<option value="${year}"${year === currentYear ? ' selected' : ''}>${year}</option>`);
-                                            }
-                                        </script>
-                                    </select>
-                                </div> -->
 
                                 <div class="chart-responsive">
                                     <canvas id="areaChart" height="100"></canvas>
@@ -1141,7 +1148,139 @@
                                     </script> 
                                 </div>
                             </div>
-                            <!-- /.box-body-->
+                            
+                        </div>
+                    </div> -->
+
+                    <div class="col-md-6">
+                        <div class="box box-primary">
+                            <div class="box-header" style="text-align: center;">
+                                <h3 class="box-title">Number of Requests per Month</h3>
+                                <div class="box-tools pull-right">
+                                    <button style="border: none;" type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                </div>
+                            </div>
+
+                            <div class="box-body">
+                                <div style="text-align: center;">
+                                    <i class="fa fa-circle-o text-aqua fa-lg"></i> RFS &nbsp;
+                                    <i class="fa fa-circle-o text-light-blue fa-lg"></i> TOR &nbsp;
+                                    <i class="fa fa-circle-o text-gray fa-lg"></i> ISR &nbsp;
+                                </div>
+
+                                <!-- Year Filter Dropdown -->
+                                <div style="text-align: center; margin-bottom: 10px;">
+                                    <select id="yearFilter" class="form-control" style="width: auto; display: inline-block;">
+                                        <option value="">Select Year</option>
+                                        <option value="2023">2023</option>
+                                        <option value="2024">2024</option>
+                                        <!-- Add more years as needed -->
+                                    </select>
+                                </div>
+
+                                <div class="chart-responsive">
+                                    <canvas id="areaChart" height="100"></canvas>
+
+                                    <script>
+                                        document.addEventListener('DOMContentLoaded', function () {
+                                            const canvas = document.getElementById('areaChart');
+                                            const ctx = canvas.getContext('2d');
+                                            let areaChart = new Chart(ctx);
+
+                                            function fetchDataCountByMonth(year) {
+                                                const apiUrl = `<?= site_url('Admin/getDataCountByMonth'); ?>?year=${year}`;
+                                                fetch(apiUrl)
+                                                    .then(response => response.json())
+                                                    .then(data => {
+                                                        const labels = Object.keys(data);
+                                                        const dataPointsRfs = [];
+                                                        const dataPointsTor = [];
+                                                        const dataPointsIsr = [];
+
+                                                        labels.forEach(month => {
+                                                            dataPointsRfs.push(data[month].rfs_count);
+                                                            dataPointsTor.push(data[month].tor_count);
+                                                            dataPointsIsr.push(data[month].isr_count);
+                                                        });
+
+                                                        const areaChartData = {
+                                                            labels: labels,
+                                                            datasets: [
+                                                                {
+                                                                    label: 'RFS',
+                                                                    fillColor: '#00c0ef',
+                                                                    strokeColor: '#00c0ef',
+                                                                    pointColor: '#00c0ef',
+                                                                    pointStrokeColor: '#c1c7d1',
+                                                                    pointHighlightFill: '#fff',
+                                                                    pointHighlightStroke: 'rgba(220,220,220,1)',
+                                                                    data: dataPointsRfs
+                                                                },
+                                                                {
+                                                                    label: 'TOR',
+                                                                    fillColor: '#3c8dbc',
+                                                                    strokeColor: '#3c8dbc',
+                                                                    pointColor: '#3c8dbc',
+                                                                    pointStrokeColor: '#c1c7d1',
+                                                                    pointHighlightFill: '#fff',
+                                                                    pointHighlightStroke: 'rgba(220,220,220,1)',
+                                                                    data: dataPointsTor
+                                                                },
+                                                                {
+                                                                    label: 'ISR',
+                                                                    fillColor: '#d2d6de',
+                                                                    strokeColor: '#d2d6de',
+                                                                    pointColor: '#d2d6de',
+                                                                    pointStrokeColor: '#c1c7d1',
+                                                                    pointHighlightFill: '#fff',
+                                                                    pointHighlightStroke: 'rgba(220,220,220,1)',
+                                                                    data: dataPointsIsr
+                                                                }
+                                                            ]
+                                                        };
+
+                                                        const areaChartOptions = {
+                                                            showScale: true,
+                                                            scaleShowGridLines: false,
+                                                            scaleGridLineColor: 'rgba(0,0,0,.05)',
+                                                            scaleGridLineWidth: 1,
+                                                            scaleShowHorizontalLines: true,
+                                                            scaleShowVerticalLines: true,
+                                                            bezierCurve: true,
+                                                            bezierCurveTension: 0.3,
+                                                            pointDot: true,
+                                                            pointDotRadius: 2,
+                                                            pointDotStrokeWidth: 0.5,
+                                                            pointHitDetectionRadius: 20,
+                                                            datasetStroke: true,
+                                                            datasetStrokeWidth: 2,
+                                                            datasetFill: false,
+                                                            maintainAspectRatio: true,
+                                                            responsive: true,
+                                                        };
+
+                                                        // areaChart.destroy(); // Destroy the previous chart instance
+                                                        canvas.width = canvas.width;
+                                                        areaChart = new Chart(ctx).Line(areaChartData, areaChartOptions);
+                                                    })
+                                                    .catch(error => {
+                                                        console.error('Error fetching data:', error);
+                                                    });
+                                            }
+
+                                            // Call the fetchDataCountByMonth function initially for all years.
+                                            fetchDataCountByMonth('');
+
+                                            // Update chart when year is changed
+                                            document.getElementById('yearFilter').addEventListener('change', function () {
+                                                const selectedYear = this.value;
+                                                fetchDataCountByMonth(selectedYear);
+                                            });
+                                        });
+
+                                    </script>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -1297,26 +1436,47 @@
                 </div> -->
             <?php } ?>
 
-            <div class="row">
-                <div class="col-md-12"><!-- About Me Box -->
+            <!-- <div class="row">
+                <div class="col-md-12">
                     <div class="box box-primary">
                         <div class="box-header with-border">
                             <h3 class="box-title">Memo</h3>
-                        </div><!-- /.box-header -->
+                        </div>
                     
                         <div class="box-body"> 
 
                             <img src="http://172.16.161.43/rfstor/uploads/profile-pic/TOR&RFS MEMO.jpg" class="img-fluid mx-auto" style="margin: 20px;  position: center;">   
-                        </div><!-- /.box-body -->   
-                    </div><!-- /.box -->
-                </div><!-- /.col -->
+                        </div>
+                    </div>
+                </div>
                 
+            </div> -->
+
+            <div id="memoModal" class="modal fade" role="dialog">
+                <div class="modal-dialog modal-lg" style="width: 85%;">
+                    <div class="modal-content" style="border-radius: 10px">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button> 
+                            <center><img src="<?=base_url()?>assets/dist/img/logo.png" class="img-circle"  alt="logo" style="height: 40px; width: 40px;"></center> 
+                        <h4 style="text-align: center;" class="modal-title"><b>Memo</b></h4>
+                        </div>
+                        <div class="modal-body">
+                    
+                            <iframe src="<?=base_url()?>uploads/profile-pic/TOR&RFS MEMO.jpg" width="100%" height="600" allow="autoplay"></iframe>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button> 
+                        </div>
+                    </div>
+                </div>
             </div>
 
+            
             <div class="row" >
 
                 <div class="col-xs-12 text-left">
                     <div style="margin-top: 5px;" class="form-group">
+                        <a class="btn btn-primary" data-toggle="modal" data-target="#memoModal"><i class="fa fa-eye" aria-hidden="true"></i> Show Memo</a>
                         <a class="btn btn-primary " id="view_btn"><i class="fa fa-eye" aria-hidden="true"></i> Show Profile</a>
                         <a class="btn btn-primary hidden" id="hide_btn"><i class="fa fa-eye-slash" aria-hidden="true"></i> Hide Profile</a>
                     </div>

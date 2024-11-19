@@ -178,8 +178,8 @@
 	 	public function find_employee($search)
 	 	{
 	 		$query = $this->db2->select('emp_id, name, emp_no')
-	 				// ->where('current_status', 'Active')
-	 				->where_in('current_status', array('Active', 'End of Contract'))
+	 				->where('current_status', 'Active')
+	 				//->where_in('current_status', array('Active', 'End of Contract'))
 	 				->group_start()
 	 					->like('emp_id', $search)
 	 					->or_like('emp_no', $search)
@@ -294,7 +294,7 @@
 
 	 	public function find_employee_photo()
 	 	{
-	 		$ids = array('21114-2013','02723-2022','03845-2015','03075-2022', '01472-2018');
+	 		$ids = array('43864-2013','21114-2013','02723-2022','03845-2015','03075-2022', '01472-2018');
 	 		$query = $this->db2->from('pis.applicant')
 	 				->join('pis.employee3', 'employee3.emp_id = pis.applicant.app_id')
 	 				->where_in('applicant.app_id', $ids)

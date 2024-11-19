@@ -2,6 +2,7 @@
 <link rel="stylesheet" href="<?=base_url()?>assets/plugins/sweetalert2/sweetalert2.min.css">
 <link rel="stylesheet" href="<?=base_url()?>assets/plugins/toastr/toastr.min.css">
 <link rel="stylesheet" href="<?=base_url()?>assets/css/sweetalert.css">
+<link rel="stylesheet" href="<?=base_url()?>assets/css/jquery-ui.min.css" />
 
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">

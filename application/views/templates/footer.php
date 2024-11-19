@@ -17,6 +17,8 @@
 <script src="<?=base_url()?>assets/dist/js/adminlte.min.js"></script>
 <script src="<?=base_url()?>assets/dist/js/demo.js"></script>
 <script src="<?=base_url()?>assets/js/password.js"></script>
+
+
 <!-- <script src="<?=base_url()?>assets/js/sweetalert.js"></script> -->
 <script src="<?=base_url()?>assets/plugins/DataTables/datatables.min.js"></script>
 <script src="<?=base_url()?>assets/plugins/DataTables/Buttons-2.3.3/js/dataTables.buttons.min.js"></script>

@@ -7,26 +7,32 @@
 	 		$this->db3 = $this->load->database('ebs', TRUE);
 	 	}
 
-	 	public function getDataCountByMonth()
-		{
-		    $this->db->select("DATE_FORMAT(datetoday, '%b-%y') AS month, 
-		                       SUM(CASE WHEN typeofrequest = 'RFS' THEN 1 ELSE 0 END) AS rfs_count, 
-		                       SUM(CASE WHEN typeofrequest = 'TOR' THEN 1 ELSE 0 END) AS tor_count,
-		                       SUM(CASE WHEN typeofrequest = 'ISR' THEN 1 ELSE 0 END) AS isr_count", false);
-		    $this->db->group_by("DATE_FORMAT(datetoday, '%Y-%m')");
-		    $query = $this->db->get('requests');
-
-		    $dataByMonth = array();
-		    foreach ($query->result_array() as $row) {
-		        $dataByMonth[$row['month']] = array(
-		            'rfs_count' => $row['rfs_count'],
-		            'tor_count' => $row['tor_count'],
-		            'isr_count' => $row['isr_count']
-		        );
-		    }
-
-		    return $dataByMonth;
+	 	public function getDataCountByMonth($year = null) {
+			$this->db->select("DATE_FORMAT(datetoday, '%b-%y') AS month, 
+							   SUM(CASE WHEN typeofrequest = 'RFS' THEN 1 ELSE 0 END) AS rfs_count, 
+							   SUM(CASE WHEN typeofrequest = 'TOR' THEN 1 ELSE 0 END) AS tor_count,
+							   SUM(CASE WHEN typeofrequest = 'ISR' THEN 1 ELSE 0 END) AS isr_count", false);
+			
+			if ($year) {
+				// Add a where condition to filter by the specified year
+				$this->db->where("YEAR(datetoday)", $year);
+			}
+		
+			$this->db->group_by("DATE_FORMAT(datetoday, '%Y-%m')");
+			$query = $this->db->get('requests');
+		
+			$dataByMonth = array();
+			foreach ($query->result_array() as $row) {
+				$dataByMonth[$row['month']] = array(
+					'rfs_count' => $row['rfs_count'],
+					'tor_count' => $row['tor_count'],
+					'isr_count' => $row['isr_count']
+				);
+			}
+		
+			return $dataByMonth;
 		}
+		
 
 		// public function getDataCountByMonth($year = null)
 		// {
@@ -818,12 +824,13 @@
 	 		return $query->row();
 	 	}
 
-	 	public function request_no($id)
-	 	{
-	 		$query = $this->db->select('*')
-	 					->get_where('requests', array('requestnumber' => $id));
-	 		return $query->row();
-	 	}
+	 	public function request_no($id, $rtype)
+		{
+			$query = $this->db->select('*')
+							->get_where('requests', array('requestnumber' => $id, 'typeofrequest' => $rtype));
+			return $query->row();
+		}
+
 
 	 	
 	 	public function getUsers()
@@ -1221,7 +1228,8 @@
 
 	 	public function getReqTorApprovebyRequest($id)
 	 	{	
-	 		$userid = $this->session->userdata['user_id'];
+	 		//var_dump($id);
+			$userid = $this->session->userdata['user_id'];
 	 		$this->db->select('*, requests.status as reqstatus,requests.id as reqid, usergroups.groupname, tortypes.tortype');
 			$this->db->from('requests');	
 			$this->db->join('grouprole', 'grouprole.id = requests.togroup');
@@ -1232,6 +1240,7 @@
 			$this->db->join('tortypes', 'tortypes.id = requests.tortypes');
 			
 			$this->db->where("requests.id='$id'");
+			
 			$query = $this->db->get();
 			return $query->row();
 	 	}

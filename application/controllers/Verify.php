@@ -37,40 +37,40 @@
               
                 $bu = $this->Admin_Model->bu_name($req->buid);
                               
-                $verifydetails = $this->user_model->getuserDetails2($req->verifiedby);
-                $verifiedby = $this->employee_model->find_an_employee(@$verifydetails->emp_id);
+				$verifydetails = $this->Admin_Model->getUserData2($req->verifiedby);
                 
-                $canceldetails = $this->user_model->getuserDetails2($req->cancelledby);
-                $cancelledby = $this->employee_model->find_an_employee(@$canceldetails->emp_id);
-                //$requestedby = $this->employee_model->find_an_employee($req->emp_id);
+                $canceldetails = $this->Admin_Model->getUserData2($req->cancelledby);
+                
                 $requestedby = $this->Admin_Model->getUserData2($req->userid);
 
                 $sub_array = [];
 
                 $sub_array[] = '<span style="color: red; align: center; font-weight: bold">'.$req->requestnumber.'</span>';
-                if($req->verifiedby != '0'){
-                    $sub_array[] = date("D • h:i:s A • M. d, Y ",strtotime($req->date_verified));
-                }elseif($req->cancelledby != '0'){
-                    $sub_array[] = date("D • h:i:s A • M. d, Y ",strtotime($req->date_cancelled));
-                }else{
-                    $sub_array[] = date("D • h:i:s A • M. d, Y ",strtotime($req->datetoday));
-                }
+
+                $sub_array[] = date("D • h:i:s A • M. d, Y ",strtotime($req->datetoday));
+
                 $sub_array[] = $req->groupname;
                 $sub_array[] = $req->companyname;
                 $sub_array[] = $bu->business_unit;
                 $sub_array[] = @$requestedby->name;
                 $sub_array[] = $req->purpose;
 
-                // $stat1="";
-                if($req->verifiedby != '0'){
-                    $sub_array[] = $verifiedby->name;        
+                $stat1="";
+                
+				if($req->verifiedby != '0'){
+                    $stat1 .= $verifydetails->name;        
                 }
-                if($req->reqstatus == 'Cancelled') {
-                    $sub_array[] = $cancelledby->name;
+                elseif($req->reqstatus == 'Cancelled') {
+                    $stat1 .= $canceldetails->name;
                 }
-                if($req->verifiedby == '0' AND $req->cancelledby == '0')  {
-                   $sub_array[] = '<span style="color: orange;  align: center";><i class="fa fa-question-circle fa-lg" aria-hidden="true" ></i></span>';
+
+                elseif($req->reqstatus == 'Cancelled' AND $req->verifiedby != '0') {
+                    $stat1 .= $canceldetails->name;
                 }
+                else{
+                   $stat1 .= '<span style="color: orange; align: center";><i class="fa fa-question-circle " aria-hidden="true" ></i></span>';
+                }
+				$sub_array[] = $stat1;
 
                 $stat = "";
                 

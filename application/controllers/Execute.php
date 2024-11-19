@@ -26,6 +26,20 @@
 
         }
 
+        public function update_status_to_approve() {
+            
+    
+            // Call the model function to update the status
+            $result = $this->execute_model->update_status();
+    
+            // Respond to AJAX call
+            if($result) {
+                echo json_encode(['status' => 'success', 'message' => 'Status updated successfully!']);
+            } else {
+                echo json_encode(['status' => 'error', 'message' => 'Failed to update status.']);
+            }
+        }
+
         public function request_list() //the details of the requests list table for Execute users
         {
             $payload = $this->input->post(NULL,TRUE);

@@ -67,6 +67,18 @@
             echo json_encode($data);
         }
 
+        public function getLatestRequestsRemarks() {
+            
+            $newRequestCount = $this->request_model->countRequestsAddedWithinIntervalRemarks();
+            
+            $data = array(
+                'newRequestCount' => $newRequestCount
+            );
+
+            header('Content-Type: application/json');
+            echo json_encode($data);
+        }
+
         public function request_list() //the details of the requests list table for Request users
         {
             $payload = $this->input->post(NULL,TRUE);
@@ -211,6 +223,7 @@
                         }else{
                             $isr .= '
                             <a title="View Details ISR" style="color: orange; cursor: pointer"  data-toggle="modal" data-target="#ApproveIsrModal" onclick=approveisr_content('.$req->reqid.')><i class="fa fa-file-text-o fa-lg" aria-hidden="true" ></i></a>&nbsp;&nbsp; || &nbsp;';
+                            
                         }
 
                         if ($req->remarks != '') {
@@ -533,7 +546,7 @@
                                         $verifydetails = $this->user_model->getuserDetails2($row->verifiedby);
                                         $verifiedby = $this->employee_model->find_an_employee(@$verifydetails->emp_id);
 
-                                        echo'<td style="text-align: center; color: #3c8dbc; cursor: pointer;">'.$verifiedby->name.'</td>';
+                                        echo'<td style="text-align: center; color: #3c8dbc; cursor: pointer;">'.$verifydetails->name.'</td>';
                                     }else{
                                        echo'<td style="text-align: center;"><span class="label label-warning">Pending</span></td>';
                                     }
@@ -1051,7 +1064,7 @@
 		                <div class="form-group">
 		                    <label for="usergroup">User Group</label><br>
 		                    <select style="width: 100%; padding:5px;" class="select-group form-control" name="usergroup" id="usergroup" required">
-		                        <option></option>';
+		                        <option ></option>';
 		    					foreach ($data1 as $value) {
 		                echo   '<option value="'.$value->group_id.'">'.$value->groupname.'</option>';
 		                    	}
@@ -1063,8 +1076,9 @@
 		                <div class="form-group">
 		                    <label for="type">Type of Request</label><br>
 		                    <select style="width: 100%; height: resolve; padding:5px;" class="select-type form-control" name="tortype" id="tortype" required">
-		                        <option></option>';
+		                        <option value="1">Select Request Type</option>';
 		    					foreach ($data2 as $value) {
+                                    
 		                echo   '<option value="'.$value->tor_id.'">'.$value->tortype.'</option>';
 		                    	}
 		                echo '</select>
@@ -1092,7 +1106,7 @@
         ?>
         	<script>
         		$(".select-type").select2({
-			        placeholder: "Select a Request Type",
+			        
 			        allowClear: true
 			    });
 
@@ -3195,15 +3209,18 @@
 
         public function approvetor_content() //displays TOR details 
         {
-            $row = $this->Admin_Model->getReqTorApprovebyRequest($_POST['ids']);
+            $id = $this->input->post('ids');
+            $row = $this->Admin_Model->getReqTorApprovebyRequest($id);
             //$group = $row->togroup;
             // $data1 = $this->Admin_Model->getUserGroup();
             // $data2 = $this->Admin_Model->getUserTor();
             // $data3 = $this->Admin_Model->getUserRfsMode();
+            // var_dump($id);
             $type = 'TOR';
-            $data4 = $this->Admin_Model->getFiles($row->requestnumber,$type); 
-            $data5 = $this->Admin_Model->getFilesCount($row->requestnumber,$type); 
-            $bu_name = $this->Admin_Model->bu_name($row->buid); 
+            @$data4 = $this->Admin_Model->getFiles($row->requestnumber,$type); 
+            //var_dump($row->requestnumber);
+            @$data5 = $this->Admin_Model->getFilesCount($row->requestnumber,$type); 
+            @$bu_name = $this->Admin_Model->bu_name($row->buid); 
 
             @$emp = $this->employee_model->find_an_employee5($row->userid); 
             @$dept_code = $this->employee_model->find_an_employee3($emp->emp_id);
@@ -3216,20 +3233,20 @@
             }
 
             //$stat = $row->status;
-            echo'<div><label for="company">Control No:</label>  <b style="color:red">'.$row->requestnumber.'</b></div><br>';
+            echo'<div><label for="company">Control No:</label>  <b style="color:red">'.@$row->requestnumber.'</b></div><br>';
             echo    '<div class ="row">
                     <div class="col-md-6">      
                         <div class="form-group">
                             <label for="company">Company Name</label>
-                            <input type="hidden" class="form-control" name="id" id="id"  value="'.$row->reqid.'" required>
-                            <input type="hidden" class="form-control" name="rfs_no" id="rfs_no"  value="'.$row->requestnumber.'" required>
-                            <input type="text" class="form-control" name="company" id="company"   value="'.$row->companyname.'" readonly >
+                            <input type="hidden" class="form-control" name="id" id="id"  value="'.@$row->reqid.'" required>
+                            <input type="hidden" class="form-control" name="rfs_no" id="rfs_no"  value="'.@$row->requestnumber.'" required>
+                            <input type="text" class="form-control" name="company" id="company"   value="'.@$row->companyname.'" readonly >
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="bu">Business Unit</label>
-                            <input type="text" class="form-control" name="bu" id="bu"   value="'.$bu_name->business_unit.'"  readonly>
+                            <input type="text" class="form-control" name="bu" id="bu"   value="'.@$bu_name->business_unit.'"  readonly>
                         </div>
                     </div>
 
@@ -3243,14 +3260,14 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="contact">IP Phone No. (if necessary)</label>
-                            <input type="text" class="form-control" name="contact" id="contact"   value="'.$row->contactno.'" readonly>
+                            <input type="text" class="form-control" name="contact" id="contact"   value="'.@$row->contactno.'" readonly>
                         </div>
                     </div>
 
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="date">Date</label>
-                            <input type="text" class="form-control" name="date" id="date"   value="'.date("m-d-Y | h:i:s A", strtotime($row->datetoday)).'"  readonly>
+                            <input type="text" class="form-control" name="date" id="date"   value="'.date("m-d-Y | h:i:s A", strtotime(@$row->datetoday)).'"  readonly>
                         </div>
                     </div>
                                
@@ -3259,14 +3276,14 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="usergroup">User Group</label><br>
-                            <input type="text" class="form-control" name="usergroup" id="usergroup"   value="'.$row->groupname.'" readonly>
+                            <input type="text" class="form-control" name="usergroup" id="usergroup"   value="'.@$row->groupname.'" readonly>
                         </div>
                     </div>
 
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="type">Type of Request</label><br>
-                            <input type="text" class="form-control" name="rfstype" id="rfstype"   value="'.$row->tortype.'" readonly>
+                            <input type="text" class="form-control" name="rfstype" id="rfstype"   value="'.@$row->tortype.'" readonly>
                         </div>
                     </div>
 
@@ -3276,14 +3293,14 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="purpose">Purpose</label><br>
-                            <textarea id="purpose" name="purpose" rows="5" cols="42" readonly>';echo $row->purpose; echo'</textarea>
+                            <textarea id="purpose" name="purpose" rows="5" cols="42" readonly>';echo @$row->purpose; echo'</textarea>
                         </div>
                     </div>
 
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="details">Details</label><br>
-                            <textarea placeholder="Include I.P. if necessary" id="details" name="details" rows="5" cols="42" readonly>';echo $row->details; echo'</textarea>
+                            <textarea placeholder="Include I.P. if necessary" id="details" name="details" rows="5" cols="42" readonly>';echo @$row->details; echo'</textarea>
                         </div>
                     </div>
 
@@ -4145,6 +4162,7 @@
                             <input type="hidden" class="form-control" name="id" id="id" value="'.$row->id.'">
                             
                             <textarea id="remarks" name="remarks" ></textarea>
+                            <textarea id="remarks_sup" name="remarks_sup" ></textarea>
                         </div>
                     </div> 
                 </div>
@@ -4196,6 +4214,7 @@
                 $userid     = $this->session->userdata['user_id'];
                 $name      = $this->session->userdata['name'];
                 $remarks = $this->security->xss_clean($this->input->post('remarks'));
+                $remarks_sup = $this->security->xss_clean($this->input->post('remarks_sup'));
                 // if($remarks == ''){
                 //     $remarks1 = '';
                 // }else{
@@ -4203,8 +4222,11 @@
                 // }
                 
                 $data = array(
-                    
-                    'remarks'           => $remarks     
+                    'date_remarked'           => date("Y-m-d H:i:s"), 
+                    'date_remarked_sup'           => date("Y-m-d H:i:s"), 
+                    'remarks_savedby'         => $userid,
+                    'remarks'                 => $remarks,
+                    'remarks_sup'             => $remarks_sup     
                 );
                 $this->Admin_Model->saveRemarks($data,$request_id);
 

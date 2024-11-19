@@ -184,6 +184,50 @@
 		    }
 	    }
 
+		public function countRequestsAddedWithinIntervalRemarks() {
+			$userid = $this->session->userdata['user_id'];
+		
+			$this->db->select("
+				SUM(CASE WHEN typeofrequest = 'RFS' THEN 1 ELSE 0 END) AS rfsCount,
+				SUM(CASE WHEN typeofrequest = 'TOR' THEN 1 ELSE 0 END) AS torCount,
+				SUM(CASE WHEN typeofrequest = 'ISR' THEN 1 ELSE 0 END) AS isrCount
+			");
+			$this->db->from('requests');
+			$this->db->join('grouprole', 'grouprole.group_id = requests.togroup');
+			$this->db->join('burole', 'burole.bunit_code = requests.buid');
+			$this->db->where("
+				requests.remarks != '' 
+				AND grouprole.user_id = '$userid' 
+				AND grouprole.status = 'Active'
+				AND burole.user_id = '$userid' 
+				AND burole.status = 'Active'
+				AND requests.date_remarked >= DATE_SUB(NOW(), INTERVAL 1 DAY)
+				AND requests.status != 'Approved'
+				
+			");
+			// $this->db->group_start(); // Start grouping conditions for OR
+			// $this->db->where("date_remarked >= DATE_SUB(NOW(), INTERVAL 1 DAY)");
+			// $this->db->or_where("requests.status != 'Approved'");
+			// $this->db->group_end(); // End grouping conditions for OR
+			$query = $this->db->get();
+		
+			if ($query->num_rows() > 0) {
+				$result = $query->row();
+				return [
+					'rfsCount' => $result->rfsCount,
+					'torCount' => $result->torCount,
+					'isrCount' => $result->isrCount,
+				];
+			} else {
+				return [
+					'rfsCount' => 0,
+					'torCount' => 0,
+					'isrCount' => 0,
+				];
+			}
+		}
+		
+
 	 	
 	 
 	}

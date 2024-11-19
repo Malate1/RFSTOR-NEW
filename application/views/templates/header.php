@@ -87,6 +87,13 @@
 		
 	}
 
+	.custom-toast {
+		font-size: 2.5rem; /* Increase font size */
+		padding: 40px; /* Add more padding */
+		width: 400px !important; /* Adjust width */
+		height: 100px !important; /* Allow height to adjust automatically */
+	}
+
 	
 	.badge-danger {
 	    color: #fff;
@@ -549,7 +556,7 @@
 	.box-primary{
         box-shadow: 0 0 20px #3336;
     }
-}
+
 </style>
 
 
@@ -608,6 +615,38 @@
 			                  	<li id="isr">
 			                    	<a href="<?=base_url('pending-isr-status-e')?>" >
 			                      	<i style="color: #d2d6de" class="fa fa-clipboard"></i> <span id="newISRCount"></span> pending ISR to execute 
+			                    	</a>
+			                  	</li>
+		                	</ul>
+	              		</li>
+	              		<li class="footer"></li>
+	            	</ul>
+	          	</li>
+
+	        <?php } ?>
+
+			<?php if($getType2 == true){ ?>
+	          	<li class="dropdown notifications-menu">
+	            	<a href="#" id="resetCountButtonReq" class="dropdown-toggle" data-toggle="dropdown">
+	              		<i  class="fa fa-bell-o" style="font-size: 16px;"></i>
+	              		<span class="label label-danger" id="newAllCountReq"></span>
+	            	</a>
+	            	<ul class="dropdown-menu">
+	              		<li style="font-size: 12px; text-align: center;" class="header"> <span id="newCountReq"></span> Request Remarks Notifications</li>
+	              		<li>
+		                	<ul  class="menu" style="font-size: 12px;">
+			                  	<li id="rfs">
+			                    	<a href="<?=base_url('view-rfs')?>" >
+			                      	<i style="color: #00c0ef;" class="fa fa-clipboard"></i> <span id="newRFSCountReq"></span> remarks added to RFS 
+			                    	</a>
+			                  	</li>
+			                  	<li id="tor">
+			                    	<a href="<?=base_url('view-tor')?>" >
+			                      		<i style="color: #3c8dbc" class="fa fa-clipboard "></i> <span id="newTORCountReq"></span> remarks added to TOR
+			                  	</li>
+			                  	<li id="isr">
+			                    	<a href="<?=base_url('view-isr')?>" >
+			                      	<i style="color: #d2d6de" class="fa fa-clipboard"></i> <span id="newISRCountReq"></span> remarks added to ISR
 			                    	</a>
 			                  	</li>
 		                	</ul>
@@ -694,180 +733,395 @@
 
 
 			  	<?php if($getType4 == true){ ?>
-				    	var originalTitle = document.title;
-				        var animationInterval; 
-				        var marqueePosition = 0;
-				        var stop ='';
-				        var updateInterval; // Declare the update interval variable
-						var restartInterval = true; // Variable to control interval restart
+					var originalTitle = document.title;
+					var animationInterval; 
+					var marqueePosition = 0;
+					var stop ='';
+					var updateInterval; // Declare the update interval variable
+					var restartInterval = true; // Variable to control interval restart
 
-				        // Function to handle bell button click
-						function handleBellButtonClick() {
-						    $('#resetCountButton').click(function () {
-						        
-						        // Set a flag in session storage to remember that the button was clicked
-						        localStorage.setItem('bellButtonClicked', 'true');
+					// Function to handle bell button click
+					function handleBellButtonClick() {
+						$('#resetCountButton').click(function () {
+							
+							// Set a flag in session storage to remember that the button was clicked
+							localStorage.setItem('bellButtonClicked', 'true');
 
-						        // Pause the update interval for 2 minutes (120000 milliseconds)
-			                    if (restartInterval) {
-			                        clearInterval(updateInterval); // Pause the interval
-			                        setTimeout(function () {
-			                            startUpdateInterval(); // Restart the interval after 2 minutes
-			                            restartInterval = true; // Set the flag to true for the next restart
-			                        }, 600000000); // 1 minute (adjust as needed)
-			                        restartInterval = false; // Set the flag to false to prevent multiple restarts
-			                        $('#newAllCount').hide();
-			                    }
-			                    // Hide the count and stop the title animation
-						        $('#newAllCount').hide();
-						        stopTitleAnimation();
+							// Pause the update interval for 2 minutes (120000 milliseconds)
+							if (restartInterval) {
+								clearInterval(updateInterval); // Pause the interval
+								setTimeout(function () {
+									startUpdateInterval(); // Restart the interval after 2 minutes
+									restartInterval = true; // Set the flag to true for the next restart
+								}, 600000000); // 1 minute (adjust as needed)
+								restartInterval = false; // Set the flag to false to prevent multiple restarts
+								$('#newAllCount').hide();
+							}
+							// Hide the count and stop the title animation
+							$('#newAllCount').hide();
+							stopTitleAnimation();
 
-						        
-						    });
-						}
+							
+						});
+					}
 
-						// Function to play a ringtone
-						// function playRingtone() {
-						//     var audio = new Audio('<?=base_url()?>assets/alarm4.mp3');
-						//     audio.play();
-						//     return audio; // Return the Audio object for later use
-						// }
+					// Function to play a ringtone
+					// function playRingtone() {
+					//     var audio = new Audio('<?=base_url()?>assets/alarm4.mp3');
+					//     audio.play();
+					//     return audio; // Return the Audio object for later use
+					// }
 
-				
-				        function updateMenuCounts() {
-				        	
-				            $.ajax({
-				                url: '<?= base_url('Request/getLatestRequests') ?>',
-				                method: 'GET',
-				                dataType: 'json',
-				                success: function(data) {
-				                    // Update the menu item text with the latest count
-				                	var rfs 	 = $('#rfs');
-				                	var tor 	 = $('#tor');
-				                	var isr 	 = $('#isr');
-				                    var rfsCount = parseInt(data.newRequestCount.rfsCount, 10);
-									var torCount = parseInt(data.newRequestCount.torCount, 10);
-									var isrCount = parseInt(data.newRequestCount.isrCount, 10);
-									// Check if the parsed values are valid integers, and if not, default them to 0
-									if (isNaN(rfsCount)) {
-									    rfsCount = 0;
-									    
-									}
-									if (isNaN(torCount)) {
-									    torCount = 0;
-									    
-									}
-									if (isNaN(isrCount)) {
-									    isrCount = 0;
-									    
-									}
-							        // Calculate the total count
-							        var totalCount = rfsCount + torCount + isrCount;
-							        $('#newAllCount').text(totalCount);
+			
+					function updateMenuCounts() {
+						
+						$.ajax({
+							url: '<?= base_url('Request/getLatestRequests') ?>',
+							method: 'GET',
+							dataType: 'json',
+							success: function(data) {
+								// Update the menu item text with the latest count
+								var rfs 	 = $('#rfs');
+								var tor 	 = $('#tor');
+								var isr 	 = $('#isr');
+								var rfsCount = parseInt(data.newRequestCount.rfsCount, 10);
+								var torCount = parseInt(data.newRequestCount.torCount, 10);
+								var isrCount = parseInt(data.newRequestCount.isrCount, 10);
+								// Check if the parsed values are valid integers, and if not, default them to 0
+								if (isNaN(rfsCount)) {
+									rfsCount = 0;
+									
+								}
+								if (isNaN(torCount)) {
+									torCount = 0;
+									
+								}
+								if (isNaN(isrCount)) {
+									isrCount = 0;
+									
+								}
+								// Calculate the total count
+								var totalCount = rfsCount + torCount + isrCount;
+								$('#newAllCount').text(totalCount);
 
-							        if(rfsCount == 0){
-							        	rfs.hide();;
-							        } 
-							        if(torCount == 0){
-							        	tor.hide();
-							        }
-							        if(isrCount == 0){
-							        	isr.hide();
-							        }
-				            
-				                    $('#newRFSCount').text(rfsCount);
-				                    $('#newTORCount').text(torCount);
-				                    $('#newISRCount').text(isrCount);
+								if(rfsCount == 0){
+									rfs.hide();;
+								} 
+								if(torCount == 0){
+									tor.hide();
+								}
+								if(isrCount == 0){
+									isr.hide();
+								}
+						
+								$('#newRFSCount').text(rfsCount);
+								$('#newTORCount').text(torCount);
+								$('#newISRCount').text(isrCount);
 
-				                    var newAllCountElement 	= $('#newAllCount');
-				                    $('#newCount').text(newAllCountElement.text());
-				                     
+								var newAllCountElement 	= $('#newAllCount');
+								$('#newCount').text(newAllCountElement.text());
+									
 
 
 
-				                    if (totalCount > 0) {
-									    newAllCountElement.show();
-									    handleBellButtonClick();
+								if (totalCount > 0) {
+									newAllCountElement.show();
+									handleBellButtonClick();
 
-									    if (!originalTitle.includes("Execute")) {
-									        // Animate the page title and show a notification
-									        startTitleMarquee(' New Pending Requests! ', 60000);
-									    } else {
-									        newAllCountElement.hide();
-									        stopTitleAnimation();
-
-									        var bellButtonClicked = localStorage.getItem('bellButtonClicked') || 'false';
-						                    if (bellButtonClicked === 'true') {
-						                        // If it was clicked, hide the count and stop the animation
-						                        $('#newAllCount').hide();
-						                        stopTitleAnimation();
-						                    }
-
-									        if (restartInterval) {
-						                        clearInterval(updateInterval); // Pause the interval
-						                        setTimeout(function () {
-						                            startUpdateInterval(); // Restart the interval after 2 minutes
-						                            restartInterval = true; // Set the flag to true for the next restart
-						                        }, 60000); // 1 minute
-						                        restartInterval = false; // Set the flag to false to prevent multiple restarts
-						                        $('#newAllCount').hide();
-						                    }
-									        
-
-									    }
+									if (!originalTitle.includes("Execute")) {
+										// Animate the page title and show a notification
+										startTitleMarquee(' New Pending Requests! ', 60000);
 									} else {
+										newAllCountElement.hide();
+										stopTitleAnimation();
+
+										var bellButtonClicked = localStorage.getItem('bellButtonClicked') || 'false';
+										if (bellButtonClicked === 'true') {
+											// If it was clicked, hide the count and stop the animation
+											$('#newAllCount').hide();
+											stopTitleAnimation();
+										}
+
+										if (restartInterval) {
+											clearInterval(updateInterval); // Pause the interval
+											setTimeout(function () {
+												startUpdateInterval(); // Restart the interval after 2 minutes
+												restartInterval = true; // Set the flag to true for the next restart
+											}, 60000); // 1 minute
+											restartInterval = false; // Set the flag to false to prevent multiple restarts
+											$('#newAllCount').hide();
+										}
 										
-									    newAllCountElement.hide();
-									    stopTitleAnimation();
+
 									}
-				                },
-				                error: function(error) {
-				                    console.error('Error fetching latest requests: ' + JSON.stringify(error));
-				                }
-				            });
-				        }
+								} else {
+									
+									newAllCountElement.hide();
+									stopTitleAnimation();
+								}
+							},
+							error: function(error) {
+								console.error('Error fetching latest requests: ' + JSON.stringify(error));
+							}
+						});
+					}
 
-				        // Function to animate the page title and show a notification
-				        function startTitleMarquee(message, duration) {
-				            clearInterval(animationInterval);
+					// Function to animate the page title and show a notification
+					function startTitleMarquee(message, duration) {
+						clearInterval(animationInterval);
 
-				            // var audio = playRingtone();
+						// var audio = playRingtone();
 
-				            var titleLength = message.length;
-				            var timer = 0;
+						var titleLength = message.length;
+						var timer = 0;
 
-				            animationInterval = setInterval(function () {
-				                var animatedTitle = message.substring(marqueePosition, titleLength) + message.substring(0, marqueePosition);
-				                document.title = animatedTitle;
+						animationInterval = setInterval(function () {
+							var animatedTitle = message.substring(marqueePosition, titleLength) + message.substring(0, marqueePosition);
+							document.title = animatedTitle;
 
-				                marqueePosition = (marqueePosition + 1) % titleLength;
-				                timer += 100;
+							marqueePosition = (marqueePosition + 1) % titleLength;
+							timer += 100;
 
-				                if (timer >= duration) {
-				                    clearInterval(animationInterval);
-				                    document.title = originalTitle; // Restore the original title
-				                    // audio.pause(); // Pause the ringtone when the animation stops
-            						// audio.currentTime = 0; // Reset the playback position to the beginning
-				                    console.log('Animation executed.'); // Log the animation execution
-				                }
-				            }, 500); // Adjust the animation speed as needed (e.g., 500 milliseconds)
-				        }
+							if (timer >= duration) {
+								clearInterval(animationInterval);
+								document.title = originalTitle; // Restore the original title
+								// audio.pause(); // Pause the ringtone when the animation stops
+								// audio.currentTime = 0; // Reset the playback position to the beginning
+								console.log('Animation executed.'); // Log the animation execution
+							}
+						}, 500); // Adjust the animation speed as needed (e.g., 500 milliseconds)
+					}
 
-				        // Function to stop the title animation
-				        function stopTitleAnimation() {
-				            clearInterval(animationInterval);
-				            document.title = originalTitle; // Restore the original title
-				        }
+					// Function to stop the title animation
+					function stopTitleAnimation() {
+						clearInterval(animationInterval);
+						document.title = originalTitle; // Restore the original title
+					}
 
-				       	// Function to start the update interval
-						function startUpdateInterval() {
-						    updateMenuCounts();
-						    updateInterval = setInterval(updateMenuCounts, 50000000);
-						}
+					// Function to start the update interval
+					function startUpdateInterval() {
+						updateMenuCounts();
+						updateInterval = setInterval(updateMenuCounts, 50000000);
+					}
 
-						// Start the initial update interval
-						startUpdateInterval();
-				    <?php } ?>
+					// Start the initial update interval
+					startUpdateInterval();
+				<?php } ?>
+
+				<?php if($getType2 == true){ ?>
+					var originalTitle = document.title;
+					var animationInterval; 
+					var marqueePosition = 0;
+					var stop ='';
+					var updateInterval; // Declare the update interval variable
+					var restartInterval = true; // Variable to control interval restart
+					let toastCounter = 0;
+					let notificationInterval;
+					// Function to handle bell button click
+					function handleBellButtonClick() {
+						$('#resetCountButtonReq').click(function () {
+							
+							// Set a flag in session storage to remember that the button was clicked
+							localStorage.setItem('bellButtonClicked', 'true');
+
+							// Pause the update interval for 2 minutes (120000 milliseconds)
+							if (restartInterval) {
+								clearInterval(updateInterval); // Pause the interval
+								setTimeout(function () {
+									startUpdateInterval(); // Restart the interval after 2 minutes
+									restartInterval = true; // Set the flag to true for the next restart
+								}, 600000000); // 1 minute (adjust as needed)
+								restartInterval = false; // Set the flag to false to prevent multiple restarts
+								$('#newAllCountReq').hide();
+							}
+							// Hide the count and stop the title animation
+							$('#newAllCountReq').hide();
+							stopTitleAnimation();
+
+							
+						});
+					}
+
+					// Function to play a ringtone
+					// function playRingtone() {
+					//     var audio = new Audio('<?=base_url()?>assets/alarm4.mp3');
+					//     audio.play();
+					//     return audio; // Return the Audio object for later use
+					// }
+
+			
+					function updateMenuCounts() {
+						
+						$.ajax({
+							url: '<?= base_url('Request/getLatestRequestsRemarks') ?>',
+							method: 'GET',
+							dataType: 'json',
+							success: function(data) {
+								// Update the menu item text with the latest count
+								var rfs 	 = $('#rfs');
+								var tor 	 = $('#tor');
+								var isr 	 = $('#isr');
+								var rfsCount = parseInt(data.newRequestCount.rfsCount, 10);
+								var torCount = parseInt(data.newRequestCount.torCount, 10);
+								var isrCount = parseInt(data.newRequestCount.isrCount, 10);
+								// Check if the parsed values are valid integers, and if not, default them to 0
+								if (isNaN(rfsCount)) {
+									rfsCount = 0;
+									
+								}
+								if (isNaN(torCount)) {
+									torCount = 0;
+									
+								}
+								if (isNaN(isrCount)) {
+									isrCount = 0;
+									
+								}
+								// Calculate the total count
+								var totalCount = rfsCount + torCount + isrCount;
+								$('#newAllCountReq').text(totalCount);
+
+								if (rfsCount > 0) {
+								$('#newAllCountReq').show();
+
+								// Show the SweetAlert toast only if it has been shown less than 10 times
+								if (toastCounter < 100) {
+									console.log('Displaying SweetAlert notification');
+
+									var Toast = Swal.mixin({
+										toast: true,
+										position: 'top',
+										showConfirmButton: false,
+										// timer: 2000,
+										// timerProgressBar: true,
+										customClass: {
+											container: 'custom-toast', // Add a custom class for styling
+										},
+										didOpen: (toast) => {
+											toast.addEventListener('click', () => {
+												window.location.href = '<?= base_url('Request/ViewRfsPending') ?>';
+												clearInterval(notificationInterval); // Stop the interval
+												Swal.close(); // Close the Swal
+												toastCounter = 100; // Ensure the condition stops further notifications
+											});
+										},
+									});
+
+									Toast.fire({
+										icon: 'info',
+										title: 'You have ' + rfsCount + ' remarks for RFS.'
+									}).then((result) => {
+										if (result.isConfirmed || result.dismiss === Swal.DismissReason.close) {
+											clearInterval(notificationInterval); // Stop the interval when OK is clicked
+											toastCounter = 100; // Ensure the condition stops further notifications
+										}
+									});
+
+									// Increment the toast counter
+									toastCounter++;
+								}
+
+							} else {
+								$('#newAllCountReq').hide();
+							}
+
+						
+								$('#newRFSCountReq').text(rfsCount);
+								$('#newTORCountReq').text(torCount);
+								$('#newISRCountReq').text(isrCount);
+
+								var newAllCountElement 	= $('#newAllCountReq');
+								$('#newCountReq').text(newAllCountElement.text());
+									
+
+
+
+								if (totalCount > 0) {
+									newAllCountElement.show();
+									handleBellButtonClick();
+
+									if (!originalTitle.includes("Execute")) {
+										// Animate the page title and show a notification
+										startTitleMarquee(' New Request Remarks! ', 60000);
+									} else {
+										newAllCountElement.hide();
+										stopTitleAnimation();
+
+										var bellButtonClicked = localStorage.getItem('bellButtonClicked') || 'false';
+										if (bellButtonClicked === 'true') {
+											// If it was clicked, hide the count and stop the animation
+											$('#newAllCountReq').hide();
+											stopTitleAnimation();
+										}
+
+										if (restartInterval) {
+											clearInterval(updateInterval); // Pause the interval
+											setTimeout(function () {
+												startUpdateInterval(); // Restart the interval after 2 minutes
+												restartInterval = true; // Set the flag to true for the next restart
+											}, 60000); // 1 minute
+											restartInterval = false; // Set the flag to false to prevent multiple restarts
+											$('#newAllCountReq').hide();
+										}
+										
+
+									}
+								} else {
+									
+									newAllCountElement.hide();
+									stopTitleAnimation();
+								}
+							},
+							error: function(error) {
+								console.error('Error fetching latest requests: ' + JSON.stringify(error));
+							}
+						});
+					}
+
+					// Function to animate the page title and show a notification
+					function startTitleMarquee(message, duration) {
+						clearInterval(animationInterval);
+
+						// var audio = playRingtone();
+
+						var titleLength = message.length;
+						var timer = 0;
+
+						animationInterval = setInterval(function () {
+							var animatedTitle = message.substring(marqueePosition, titleLength) + message.substring(0, marqueePosition);
+							document.title = animatedTitle;
+
+							marqueePosition = (marqueePosition + 1) % titleLength;
+							timer += 100;
+
+							if (timer >= duration) {
+								clearInterval(animationInterval);
+								document.title = originalTitle; // Restore the original title
+								// audio.pause(); // Pause the ringtone when the animation stops
+								// audio.currentTime = 0; // Reset the playback position to the beginning
+								console.log('Animation executed.'); // Log the animation execution
+							}
+						}, 500); // Adjust the animation speed as needed (e.g., 500 milliseconds)
+					}
+
+					// Function to stop the title animation
+					function stopTitleAnimation() {
+						clearInterval(animationInterval);
+						document.title = originalTitle; // Restore the original title
+					}
+
+					// Function to start the update interval
+					function startUpdateInterval() {
+						updateMenuCounts();
+						updateInterval = setInterval(updateMenuCounts, 50000000);
+					}
+
+					// Start the initial update interval
+					startUpdateInterval();
+					notificationInterval = setInterval(updateMenuCounts, 5000);
+				<?php } ?>
+
+
 			</script>
 
 
@@ -1887,7 +2141,7 @@
 });
 </script>
 
-<!-- <script>
+<script>
     const snowContainer = document.getElementById("snow-container");
 	const snowContent = ['&#10052', '&#10053', '&#10054']
 
@@ -1924,4 +2178,4 @@
 	  createSnow(15)
 	  
 	});	
-</script>  -->
+</script> 

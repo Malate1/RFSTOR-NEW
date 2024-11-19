@@ -6,10 +6,7 @@ class Login extends CI_Controller {
 	function __construct()
     {
         parent::__construct();
-        // if($this->session->username == "")
-        //     {
-        //         redirect('login');
-        //     }				
+        			
         $this->load->model('Loginmodel','LoginModel');
         $this->load->model('employee_model');
         $this->load->model('Admin_model');
@@ -19,6 +16,10 @@ class Login extends CI_Controller {
 
     public function index()
     {
+        if($this->session->username != "")
+        {
+            redirect('profile');
+        }	
         $this->load->view('Admin/loginAdmin');
     }
 

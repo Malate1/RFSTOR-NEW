@@ -297,3 +297,4 @@ $route['showApprovedIsr'] 			    = 'Request/showApprovedIsr';
 $route['multipleImageStore'] 			= 'Admin/multipleImageStore';
 
 $route['fetch-bu'] 						= 'Admin/fetch_bu';
+$route['execute/update_status_to_approve'] 	= 'Execute/update_status_to_approve';

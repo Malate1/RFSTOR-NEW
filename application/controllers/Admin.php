@@ -57,11 +57,12 @@
 		}
 
         public function getDataCountByMonth() {
-            //$this->load->model('ChartModel');
-            $data = $this->Admin_Model->getDataCountByMonth();
+            $year = $this->input->get('year');
+            $data = $this->Admin_Model->getDataCountByMonth($year); // Pass the year to the model
             header('Content-Type: application/json');
             echo json_encode($data);
         }
+        
 
         // public function getDataCountByMonth($year = null) {
         //     // Load the model if not already loaded
@@ -266,7 +267,7 @@
 
             foreach ($logs as $reqlog) {
                 
-                $request_no = $this->Admin_Model->request_no($reqlog->request_id);
+                $request_no = $this->Admin_Model->request_no($reqlog->request_id,$reqlog->rtype);
 
                 $sub_array = [];
 
@@ -274,9 +275,9 @@
                 $sub_array[] = date("D • h:i:s A • M. d, Y ",strtotime($reqlog->date));
                 $sub_array[] = $reqlog->rtype;
                 // $requesttype = "";
-                    if($reqlog->rtype == 'RFS'){
+                    if($reqlog->rtype === 'RFS'){
                         $sub_array[] = '<a style="color: red; font-weight: bold; cursor: pointer"  data-toggle="modal" data-target="#ApproveRfsModal" onclick=approverfs_content('.$request_no->id.')>'.$reqlog->request_id.'</a>';
-                    }elseif ($reqlog->rtype == 'TOR') {
+                    }elseif ($reqlog->rtype === 'TOR') {
                         $sub_array[] = '<a style="color: red; font-weight: bold; cursor: pointer"  data-toggle="modal" data-target="#ApproveTorModal" onclick=approvetor_content('.$request_no->id.')>'.$reqlog->request_id.'</a>';
                     }elseif ($reqlog->rtype == "" AND $reqlog->type == "Request") {
                         $sub_array[] ='<td><a style="color: red; font-weight: bold; ">'.$reqlog->request_id.'</a>';

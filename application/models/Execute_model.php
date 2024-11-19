@@ -188,6 +188,29 @@
 	        return $query->num_rows();
 	    }
 
+		public function update_status() {
+			$sql = "UPDATE rfstor.requests a
+					SET a.status = 'Approve'
+					WHERE a.status = 'Pending'
+					  AND a.approvedby != '0'
+					  AND a.executedby != '0'
+					  AND EXISTS (
+						  SELECT 1
+						  FROM rfstor.butaskrole b
+						  WHERE b.buid = a.buid
+							AND b.status = 'Inactive'
+					  )";
+	
+			$this->db->query($sql);
+	
+			// Check if any rows were affected
+			if ($this->db->affected_rows() > 0) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+
 	    public function totalPendingRfsA()
 	 	{	
 	 		$userid = $this->session->userdata['user_id'];

@@ -132,6 +132,16 @@
                                 </div>
                             </div>
                             <br>
+                            <?php
+                                if($this->session->user_id == '1'){ ?>
+                                    <div class="row" style="padding-right: 15px; text-align: right;">
+                                        <button id="approve-status-btn" class="btn btn-primary">Approve Status</button>
+                                    </div>
+
+                                    
+                                    
+                                    <div id="responseMessage"></div>
+                            <?php } ?>    
                             <table class="table  table-striped  table-bordered table-hover dataTable no-footer" id="dt-execute" >
                             <!-- <table class="table  table-striped  table-bordered table-hover dataTable no-footer" id="editable_table" width="100%" > -->
                                 <thead>
@@ -179,6 +189,29 @@
 
          
     
+    });
+</script>
+
+<script>
+    $(document).ready(function() {
+        $('#approve-status-btn').click(function() {
+            $.ajax({
+                url: '<?php echo site_url('execute/update_status_to_approve'); ?>',  
+                type: 'POST',
+                dataType: 'json',
+                success: function(response) {
+                    if (response.status == 'success') {
+                        alert(response.message);
+                        // You can reload the page or update the UI here
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function() {
+                    alert('Error occurred while updating status.');
+                }
+            });
+        });
     });
 </script>
 
@@ -255,7 +288,8 @@
                 }
             },
             "order": [ [ 0, 'desc' ]],
-
+            'scrollCollapse': true,
+            'scrollY': '60vh',
             "scrollX": true,
             "fixedColumns":   {
                 "leftColumns": 1,

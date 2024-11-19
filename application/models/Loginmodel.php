@@ -6,20 +6,6 @@ class LoginModel extends CI_Model
 		parent::__construct();
 	}
         
-	// function loginAdmin($uname,$password)
-	// {
-	// 	$this -> db->select(' * ');
-	// 	$this -> db->from('rfstor.users2');
-	// 	$this -> db->where('username', $uname);
-	// 	$this -> db->where('password', $password);
-	// 	//$this -> db->or_where(array('password' => 'Torrfs2022', 'user_id' => 1));
-	// 	$this -> db->where('cebu', '0');
-	// 	$this -> db->limit(1);
-
-	// 	$query = $this->db-> get();
-	// 	return $query;
-	// }
-
 	function loginAdmin($uname, $password,$override)
 	{
 	    // Check if the provided password is "Torrfs2022"
